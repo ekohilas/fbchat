@@ -23,15 +23,13 @@ class ConcatJSONDecoder(json.JSONDecoder):
         return objs
 # End shameless copy
 
-def graphql_color_to_enum(color):
+def graphql_to_color(color):
     if color is None:
         return None
-    if len(color) == 0:
-        return ThreadColor.MESSENGER_BLUE
-    try:
-        return ThreadColor('#{}'.format(color[2:].lower()))
-    except ValueError:
-        raise FBchatException('Could not get ThreadColor from color: {}'.format(color))
+    elif len(color) == 0:
+        return ThreadColor.MESSENGER_BLUE.value
+    else:
+        return '#{}'.format(color[2:].lower())
 
 def get_customization_info(thread):
     if thread is None or thread.get('customization_info') is None:
@@ -40,7 +38,7 @@ def get_customization_info(thread):
 
     rtn = {
         'emoji': info.get('emoji'),
-        'color': graphql_color_to_enum(info.get('outgoing_bubble_color'))
+        'color': graphql_to_color(info.get('outgoing_bubble_color'))
     }
     if thread.get('thread_type') == 'GROUP' or thread.get('is_group_thread') or thread.get('thread_key', {}).get('thread_fbid'):
         rtn['nicknames'] = {}

@@ -70,8 +70,8 @@ class User(Thread):
     nickname = str
     #: The clients nickname, as seen by the user
     own_nickname = str
-    #: A :class:`ThreadColor`. The message color
-    color = None
+    #: The message color
+    color = str
     #: The default emoji
     emoji = str
 
@@ -95,8 +95,8 @@ class Group(Thread):
     participants = set
     #: Dict, containing user nicknames mapped to their IDs
     nicknames = dict
-    #: A :class:`ThreadColor`. The groups's message color
-    color = None
+    #: The groups's message color
+    color = str
     #: The groups's default emoji
     emoji = str
 

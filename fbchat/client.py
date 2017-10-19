@@ -1364,7 +1364,7 @@ class Client(object):
 
                     # Color change
                     elif delta_type == "change_thread_theme":
-                        new_color = graphql_color_to_enum(delta["untypedData"]["theme_color"])
+                        new_color = graphql_to_color(delta["untypedData"]["theme_color"])
                         thread_id, thread_type = getThreadIdAndThreadType(metadata)
                         self.onColorChange(mid=mid, author_id=author_id, new_color=new_color, thread_id=thread_id,
                                            thread_type=thread_type, ts=ts, metadata=metadata, msg=m)
@@ -1612,7 +1612,6 @@ class Client(object):
         :param ts: A timestamp of the action
         :param metadata: Extra metadata about the action
         :param msg: A full set of the data recieved
-        :type new_color: models.ThreadColor
         :type thread_type: models.ThreadType
         """
         log.info("Color change from {} in {} ({}): {}".format(author_id, thread_id, thread_type.name, new_color))
