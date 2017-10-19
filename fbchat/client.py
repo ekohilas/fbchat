@@ -1381,7 +1381,7 @@ class Client(object):
 
                     # Color change
                     elif delta_type == "change_thread_theme":
-                        new_color = graphql_color_to_enum(delta["untypedData"]["theme_color"])
+                        new_color = graphql_to_color(delta["untypedData"]["theme_color"])
                         thread_id, thread_type = getThreadIdAndThreadType(metadata)
                         self.onColorChange(mid=mid, author_id=author_id, new_color=new_color, thread_id=thread_id,
                                            thread_type=thread_type, ts=ts, metadata=metadata, msg=m)
@@ -1601,7 +1601,7 @@ class Client(object):
         return True
 
 
-    def onMessage(self, mid=None, author_id=None, message=None, thread_id=None, thread_type=ThreadType.USER, ts=None, metadata=None, msg={}):
+    def onMessage(self, mid=None, author_id=None, message=None, thread_id=None, thread_type=ThreadType.USER, ts=None, metadata=None, msg=None):
         """
         Called when the client is listening, and somebody sends a message
 
@@ -1617,7 +1617,7 @@ class Client(object):
         """
         log.info("Message from {} in {} ({}): {}".format(author_id, thread_id, thread_type.name, message))
 
-    def onColorChange(self, mid=None, author_id=None, new_color=None, thread_id=None, thread_type=ThreadType.USER, ts=None, metadata=None, msg={}):
+    def onColorChange(self, mid=None, author_id=None, new_color=None, thread_id=None, thread_type=ThreadType.USER, ts=None, metadata=None, msg=None):
         """
         Called when the client is listening, and somebody changes a thread's color
 
@@ -1629,12 +1629,11 @@ class Client(object):
         :param ts: A timestamp of the action
         :param metadata: Extra metadata about the action
         :param msg: A full set of the data recieved
-        :type new_color: models.ThreadColor
         :type thread_type: models.ThreadType
         """
         log.info("Color change from {} in {} ({}): {}".format(author_id, thread_id, thread_type.name, new_color))
 
-    def onEmojiChange(self, mid=None, author_id=None, new_emoji=None, thread_id=None, thread_type=ThreadType.USER, ts=None, metadata=None, msg={}):
+    def onEmojiChange(self, mid=None, author_id=None, new_emoji=None, thread_id=None, thread_type=ThreadType.USER, ts=None, metadata=None, msg=None):
         """
         Called when the client is listening, and somebody changes a thread's emoji
 
@@ -1650,7 +1649,7 @@ class Client(object):
         """
         log.info("Emoji change from {} in {} ({}): {}".format(author_id, thread_id, thread_type.name, new_emoji))
 
-    def onTitleChange(self, mid=None, author_id=None, new_title=None, thread_id=None, thread_type=ThreadType.USER, ts=None, metadata=None, msg={}):
+    def onTitleChange(self, mid=None, author_id=None, new_title=None, thread_id=None, thread_type=ThreadType.USER, ts=None, metadata=None, msg=None):
         """
         Called when the client is listening, and somebody changes the title of a thread
 
@@ -1666,7 +1665,7 @@ class Client(object):
         """
         log.info("Title change from {} in {} ({}): {}".format(author_id, thread_id, thread_type.name, new_title))
 
-    def onNicknameChange(self, mid=None, author_id=None, changed_for=None, new_nickname=None, thread_id=None, thread_type=ThreadType.USER, ts=None, metadata=None, msg={}):
+    def onNicknameChange(self, mid=None, author_id=None, changed_for=None, new_nickname=None, thread_id=None, thread_type=ThreadType.USER, ts=None, metadata=None, msg=None):
         """
         Called when the client is listening, and somebody changes the nickname of a person
 
@@ -1684,7 +1683,7 @@ class Client(object):
         log.info("Nickname change from {} in {} ({}) for {}: {}".format(author_id, thread_id, thread_type.name, changed_for, new_nickname))
 
 
-    def onMessageSeen(self, seen_by=None, thread_id=None, thread_type=ThreadType.USER, seen_ts=None, ts=None, metadata=None, msg={}):
+    def onMessageSeen(self, seen_by=None, thread_id=None, thread_type=ThreadType.USER, seen_ts=None, ts=None, metadata=None, msg=None):
         """
         Called when the client is listening, and somebody marks a message as seen
 
@@ -1699,7 +1698,7 @@ class Client(object):
         """
         log.info("Messages seen by {} in {} ({}) at {}s".format(seen_by, thread_id, thread_type.name, seen_ts/1000))
 
-    def onMessageDelivered(self, msg_ids=None, delivered_for=None, thread_id=None, thread_type=ThreadType.USER, ts=None, metadata=None, msg={}):
+    def onMessageDelivered(self, msg_ids=None, delivered_for=None, thread_id=None, thread_type=ThreadType.USER, ts=None, metadata=None, msg=None):
         """
         Called when the client is listening, and somebody marks messages as delivered
 
@@ -1714,7 +1713,7 @@ class Client(object):
         """
         log.info("Messages {} delivered to {} in {} ({}) at {}s".format(msg_ids, delivered_for, thread_id, thread_type.name, ts/1000))
 
-    def onMarkedSeen(self, threads=None, seen_ts=None, ts=None, metadata=None, msg={}):
+    def onMarkedSeen(self, threads=None, seen_ts=None, ts=None, metadata=None, msg=None):
         """
         Called when the client is listening, and the client has successfully marked threads as seen
 
@@ -1729,7 +1728,7 @@ class Client(object):
         log.info("Marked messages as seen in threads {} at {}s".format([(x[0], x[1].name) for x in threads], seen_ts/1000))
 
 
-    def onPeopleAdded(self, mid=None, added_ids=None, author_id=None, thread_id=None, ts=None, msg={}):
+    def onPeopleAdded(self, mid=None, added_ids=None, author_id=None, thread_id=None, ts=None, msg=None):
         """
         Called when the client is listening, and somebody adds people to a group thread
 
@@ -1742,7 +1741,7 @@ class Client(object):
         """
         log.info("{} added: {}".format(author_id, ', '.join(added_ids)))
 
-    def onPersonRemoved(self, mid=None, removed_id=None, author_id=None, thread_id=None, ts=None, msg={}):
+    def onPersonRemoved(self, mid=None, removed_id=None, author_id=None, thread_id=None, ts=None, msg=None):
         """
         Called when the client is listening, and somebody removes a person from a group thread
 
@@ -1755,7 +1754,7 @@ class Client(object):
         """
         log.info("{} removed: {}".format(author_id, removed_id))
 
-    def onFriendRequest(self, from_id=None, msg={}):
+    def onFriendRequest(self, from_id=None, msg=None):
         """
         Called when the client is listening, and somebody sends a friend request
 
@@ -1764,7 +1763,7 @@ class Client(object):
         """
         log.info("Friend request from {}".format(from_id))
 
-    def onInbox(self, unseen=None, unread=None, recent_unread=None, msg={}):
+    def onInbox(self, unseen=None, unread=None, recent_unread=None, msg=None):
         """
         .. todo::
             Documenting this
@@ -1776,7 +1775,7 @@ class Client(object):
         """
         log.info('Inbox event: {}, {}, {}'.format(unseen, unread, recent_unread))
 
-    def onQprimer(self, ts=None, msg={}):
+    def onQprimer(self, ts=None, msg=None):
         """
         Called when the client just started listening
 
@@ -1785,7 +1784,7 @@ class Client(object):
         """
         pass
 
-    def onChatTimestamp(self, buddylist={}, msg={}):
+    def onChatTimestamp(self, buddylist=None, msg=None):
         """
         Called when the client receives chat online presence update
 
@@ -1794,7 +1793,7 @@ class Client(object):
         """
         log.debug('Chat Timestamps received: {}'.format(buddylist))
 
-    def onUnknownMesssageType(self, msg={}):
+    def onUnknownMesssageType(self, msg=None):
         """
         Called when the client is listening, and some unknown data was recieved
 
@@ -1802,7 +1801,7 @@ class Client(object):
         """
         log.debug('Unknown message received: {}'.format(msg))
 
-    def onMessageError(self, exception=None, msg={}):
+    def onMessageError(self, exception=None, msg=None):
         """
         Called when an error was encountered while parsing recieved data
 
