@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import enum
 
 from sqlalchemy import create_engine
-from sqlalchemy import Column, Integer, String, Boolean, Float, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, Float, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.ext.declarative import declarative_base
@@ -32,10 +32,11 @@ class FBchatUserError(FBchatException):
     """Thrown by fbchat when wrong values are entered"""
 
 class Thread(Base):
+    __abstract__ = True
     #: The unique identifier of the thread. Can be used a `thread_id`. See :ref:`intro_threads` for more info
     uid = Column(String, primary_key=True)
     #: Specifies the type of thread. Can be used a `thread_type`. See :ref:`intro_threads` for more info
-    type = Column(Enum(ThreadType))
+    type = Column(Enum("ThreadType"))
     #: The thread's picture
     photo = Column(String)
     #: The name of the thread
@@ -84,6 +85,10 @@ class User(Thread):
     #: The default emoji
     emoji = Column(String)
 
+    __mapper_args__ = {
+        'concrete': True
+    }
+
     def __init__(self, uid, url=None, first_name=None, last_name=None, is_friend=None, gender=None, affinity=None, nickname=None, own_nickname=None, color=None, emoji=None, **kwargs):
         """Represents a Facebook user. Inherits `Thread`"""
         super(User, self).__init__(ThreadType.USER, uid, **kwargs)
@@ -101,13 +106,13 @@ class User(Thread):
 class Participant(Base):
     __tablename__ = "participants"
     #id = Column(Integer, primary_key=True)
-    uid = Column(String, ForeignKey("groups.uid"))
+    uid = Column(String, ForeignKey("groups.uid"), primary_key=True)
     participant = Column(Integer)
 
 class Nickname(Base):
     __tablename__ = "nicknames"
     #id = Column(Integer, primary_key=True)
-    uid = Column(String, ForeignKey("groups.uid"))
+    uid = Column(String, ForeignKey("groups.uid"), primary_key=True)
     user_id = Column(Integer)
     user_nickname = Column(String)
 
@@ -130,6 +135,10 @@ class Group(Thread):
     #: The groups's default emoji
     emoji = Column(String)
 
+    __mapper_args__ = {
+        'concrete': True
+    }
+
     def __init__(self, uid, participants=None, nicknames=None, color=None, emoji=None, **kwargs):
         """Represents a Facebook group. Inherits `Thread`"""
         super(Group, self).__init__(ThreadType.GROUP, uid, **kwargs)
@@ -145,28 +154,33 @@ class Group(Thread):
 class Admin(Base):
     __tablename__ = "admins"
     #id = Column(Integer, primary_key=True)
-    uid = Column(String, ForeignKey("rooms.uid"))
+    uid = Column(String, ForeignKey("rooms.uid"), primary_key=True)
     admin = Column(Integer)
 
 class ApprovalRequest(Base):
     __tablename__ = "approval_requests"
     #id = Column(Integer, primary_key=True)
-    uid = Column(String, ForeignKey("rooms.uid"))
+    uid = Column(String, ForeignKey("rooms.uid"), primary_key=True)
     request_user = Column(Integer)
 
 
 class Room(Group):
     __tablename__ = "rooms"
+    uid = Column(String, primary_key=True)
     # Set containing user IDs of thread admins
     admins = relationship(Admin, collection_class=set)
     # True if users need approval to join
-    approval_mode = Column(Bool)
+    approval_mode = Column(Boolean)
     # Set containing user IDs requesting to join
     approval_requests = relationship(ApprovalRequest, collection_class=set)
     # Link for joining room
     join_link = Column(String)
     # True is room is not discoverable
-    privacy_mode = Column(Bool)
+    privacy_mode = Column(Boolean)
+
+    __mapper_args__ = {
+        'concrete': True
+    }
 
     def __init__(self, uid, admins=None, approval_mode=None, approval_requests=None, join_link=None, privacy_mode=None, **kwargs):
         """Represents a Facebook room. Inherits `Group`"""
@@ -184,6 +198,7 @@ class Room(Group):
 
 
 class Page(Thread):
+    __abstract__ = True
     #: The page's custom url
     url = str
     #: The name of the page's location city
@@ -205,14 +220,15 @@ class Page(Thread):
         self.category = category
 
 class Message(Base):
+    __tablename__ = "messages"
     #: The message ID
-    uid = Column(String)
+    uid = Column(String, primary_key=True)
     #: ID of the sender
     author = Column(Integer)
     #: Timestamp of when the message was sent
     timestamp = Column(String)
     #: Whether the message is read
-    is_read = Column(Bool)
+    is_read = Column(Boolean)
     #: A list of message reactions
     reactions = {}
     #: The actual message
@@ -518,3 +534,4 @@ class MessageReaction(Enum):
     ANGRY = '😠'
     YES = '👍'
     NO = '👎'
+
