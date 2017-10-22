@@ -70,8 +70,8 @@ The same method can be applied to some user accounts, though if they've set a cu
 Here's an snippet showing the usage of thread IDs and thread types, where ``<user id>`` and ``<group id>``
 corresponds to the ID of a single user, and the ID of a group respectively::
 
-    client.sendMessage('<message>', thread_id='<user id>', thread_type=ThreadType.USER)
-    client.sendMessage('<message>', thread_id='<group id>', thread_type=ThreadType.GROUP)
+    client.send(Message(text='<message>'), thread_id='<user id>', thread_type=ThreadType.USER)
+    client.send(Message(text='<message>'), thread_id='<group id>', thread_type=ThreadType.GROUP)
 
 Some functions (e.g. :func:`Client.changeThreadColor`) don't require a thread type, so in these cases you just provide the thread ID::
 
@@ -91,7 +91,7 @@ Some of `fbchat`'s functions require these ID's, like :func:`Client.reactToMessa
 and some of then provide this ID, like :func:`Client.sendMessage`.
 This snippet shows how to send a message, and then use the returned ID to react to that message with a 😍 emoji::
 
-    message_id = client.sendMessage('message', thread_id=thread_id, thread_type=thread_type)
+    message_id = client.send(Message(text='message'), thread_id=thread_id, thread_type=thread_type)
     client.reactToMessage(message_id, MessageReaction.LOVE)
 
 
@@ -108,7 +108,7 @@ like adding users to and removing users from a group chat, logically only works 
 The simplest way of using `fbchat` is to send a message.
 The following snippet will, as you've probably already figured out, send the message `test message` to your account::
 
-    message_id = client.sendMessage('test message', thread_id=client.uid, thread_type=ThreadType.USER)
+    message_id = client.send(Message(text='test message'), thread_id=client.uid, thread_type=ThreadType.USER)
 
 You can see a full example showing all the possible thread interactions with `fbchat` by going to :ref:`examples`
 
@@ -175,8 +175,8 @@ meaning it will simply print information to the console when an event happens
 The event actions can be changed by subclassing the :class:`Client`, and then overwriting the event methods::
 
     class CustomClient(Client):
-        def onMessage(self, mid, author_id, message, thread_id, thread_type, ts, metadata, msg, **kwargs):
-            # Do something with the message here
+        def onMessage(self, mid, author_id, message_object, thread_id, thread_type, ts, metadata, msg, **kwargs):
+            # Do something with message_object here
             pass
 
     client = CustomClient('<email>', '<password>')
@@ -184,13 +184,13 @@ The event actions can be changed by subclassing the :class:`Client`, and then ov
 **Notice:** The following snippet is as equally valid as the previous one::
 
     class CustomClient(Client):
-        def onMessage(self, message, author_id, thread_id, thread_type, **kwargs):
-            # Do something with the message here
+        def onMessage(self, message_object, author_id, thread_id, thread_type, **kwargs):
+            # Do something with message_object here
             pass
 
     client = CustomClient('<email>', '<password>')
 
-The change was in the parameters that our `onMessage` method took: ``message`` and ``author_id`` got swapped,
+The change was in the parameters that our `onMessage` method took: ``message_object`` and ``author_id`` got swapped,
 and ``mid``, ``ts``, ``metadata`` and ``msg`` got removed, but the function still works, since we included ``**kwargs``
 
 .. note::
